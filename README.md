@@ -101,7 +101,7 @@ Input EEG (C, T)
 [Label Predictor G_y]                       [Gradient Reversal Layer GRL]
     │  FC(d -> 256) -> ReLU                     │  前向：恒等 R(f)=f
     │  FC(256 -> 4)                             │  反向：×(-λ)
-    ▼                                              ▼
+    ▼                                           ▼
 L_y = CE(ŷ, y_s)      (仅源域)           [Domain Classifier G_d]
                                              │  FC(d -> 256) -> ReLU
                                              │  FC(256 -> 2)
@@ -133,7 +133,7 @@ $G_d$ 也是一个 MLP，把特征 $f$ 映射到 2 类（源域 / 目标域）�
 GRL 是一个没有可学习参数的「伪层」，行为如下：
 
 - **前向传播**：恒等映射，**$R(f) = f$**；
-- **反向传播**：把传来的梯度乘以 $-\lambda$（$\lambda > 0$）。
+- **反向传播**：把传来的梯度乘以 $-\lambda$（**$\lambda > 0$**）。
 
 它的作用：在更新 $G_f$ 时，把「域判别损失」的梯度**取反**，从而让 $G_f$ 朝「使 $G_d$ 分不清域」的方向更新；与此同时 $G_d$ 自身仍朝「分得清域」的方向更新。这样一个正向、一个反向，就构成了对抗。
 
@@ -155,7 +155,7 @@ $p$ 从 0 线性增长到 1，$\lambda$ 从 0 逐渐增大并趋于 1。你需�
 ### 5.1 两个损失
 
 - **标签损失（source only）**：**$L_y = \text{CE}\big(G_y(G_f(x_s)),\ y_s\big)$**
-- **域判别损失（source + target）**：$L_d = \text{CE}\big(G_d\big(R(G_f(x))\big),\ d\big)$，其中 $d=0$（源）、$d=1$（目标）
+- **域判别损失（source + target）**：**$L_d = \text{CE}\big(G_d\big(R(G_f(x))\big),\ d\big)$**，其中 $d=0$（源）、$d=1$（目标）
 
 ### 5.2 对抗目标（min-max）
 
