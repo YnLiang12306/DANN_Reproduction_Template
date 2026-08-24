@@ -55,7 +55,7 @@ DANN 借鉴了 GAN 的对抗思想，但对抗的不是「真假」，而是「�
 
 6. 复用之前复现过的 **EEGNet / EEGConformer** 作为特征提取器 $G_f$（去掉分类头）；
 7. 实现完整的域对抗训练循环（源域有标签 + 目标域无标签的混合批训练）；
-8. 记录并分析 label loss、domain loss、$\lambda$ 调度曲线，以及源域/目标域 acc 变化；
+8. 记录并分析 label loss、domain loss、**$\lambda$** 调度曲线，以及源域/目标域 acc 变化；
 9. 用 **t-SNE** 可视化 $G_f$ 的特征分布，直观验证「域不变」是否达成；
 10. 与 **source-only 基线**（不做域适配）对比，证明 DANN 确实带来了增益。
 
@@ -132,7 +132,7 @@ $G_d$ 也是一个 MLP，把特征 $f$ 映射到 2 类（源域 / 目标域）�
 
 GRL 是一个没有可学习参数的「伪层」，行为如下：
 
-- **前向传播**：恒等映射，$R(f) = f$；
+- **前向传播**：恒等映射，**$R(f) = f$**；
 - **反向传播**：把传来的梯度乘以 $-\lambda$（$\lambda > 0$）。
 
 它的作用：在更新 $G_f$ 时，把「域判别损失」的梯度**取反**，从而让 $G_f$ 朝「使 $G_d$ 分不清域」的方向更新；与此同时 $G_d$ 自身仍朝「分得清域」的方向更新。这样一个正向、一个反向，就构成了对抗。
@@ -154,15 +154,15 @@ $p$ 从 0 线性增长到 1，$\lambda$ 从 0 逐渐增大并趋于 1。你需�
 
 ### 5.1 两个损失
 
-- **标签损失（source only）**：$L_y = \text{CE}\big(G_y(G_f(x_s)),\ y_s\big)$
+- **标签损失（source only）**：**$L_y = \text{CE}\big(G_y(G_f(x_s)),\ y_s\big)$**
 - **域判别损失（source + target）**：$L_d = \text{CE}\big(G_d\big(R(G_f(x))\big),\ d\big)$，其中 $d=0$（源）、$d=1$（目标）
 
 ### 5.2 对抗目标（min-max）
 
 $$\min_{\theta_f,\theta_y}\ \max_{\theta_d}\ \Big[ L_y - \lambda \cdot L_d \Big]$$
 
-- $G_d$（$\max$）想把 $L_d$ 降到最低，即「分得清域」；
-- $G_f$（$\min$，通过 GRL 取反）想把 $L_d$ 升到最高，即「分不清域」；
+- $G_d$（**$\max$**）想把 $L_d$ 降到最低，即「分得清域」；
+- $G_f$（**$\min$**，通过 GRL 取反）想把 $L_d$ 升到最高，即「分不清域」；
 - 同时 $G_f$ 和 $G_y$ 还要把 $L_y$ 降下来（分类要准）。
 
 ### 5.3 代码里的实现方式
@@ -196,8 +196,8 @@ evaluation: 目标域 accuracy + Kappa
 
 每个 epoch 需要记录：
 
-- 源域分类 loss（$L_y$）与源域 accuracy
-- 域判别 loss（$L_d$）与域判别 accuracy
+- 源域分类 loss（**$L_y$**）与源域 accuracy
+- 域判别 loss（**$L_d$**）与域判别 accuracy
 - 目标域（训练部分）的 accuracy（用无标签数据 monitor，仅观察趋势）
 - 当前 $\lambda$ 值
 
@@ -227,7 +227,7 @@ evaluation: 目标域 accuracy + Kappa
 
 ## 8. 最终提交内容
 
-1. **实现代码**：数据加载（含域标签）、$G_f$（复用 backbone）、$G_y$、$G_d$、GRL、训练脚本、评估脚本；**GRL 与域对抗训练循环必须详细注释**。
+1. **实现代码**：数据加载（含域标签）、**$G_f$**（复用 backbone）、**$G_y$**、**$G_d$**、GRL、训练脚本、评估脚本；**GRL 与域对抗训练循环必须详细注释**。
 
 2. **实验报告**：使用 `report-template.md` 模板撰写，包含任务说明、域设置、模型结构（重点展开 GRL 与对抗目标）、训练设置、结果分析、t-SNE 可视化与 source-only 对比。
 
